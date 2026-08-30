@@ -6,9 +6,10 @@ interface DashboardHeaderProps {
   navItems: string[];
   totalStudents: number;
   averageGpa: string;
+  favoriteCount: number;
 }
 
-function DashboardHeader({ title, tagline, navItems, totalStudents, averageGpa }: DashboardHeaderProps) {
+function DashboardHeader({ title, tagline, navItems, totalStudents, averageGpa, favoriteCount }: DashboardHeaderProps) {
   return (
     <header className="header">
       <div className="container header-inner">
@@ -35,6 +36,7 @@ function DashboardHeader({ title, tagline, navItems, totalStudents, averageGpa }
         <div className="header-stats">
           <StatBadge label="Students" value={totalStudents} />
           <StatBadge label="Avg GPA" value={averageGpa} accent />
+          <StatBadge label="Favorites" value={favoriteCount} accent />
         </div>
       </div>
     </header>

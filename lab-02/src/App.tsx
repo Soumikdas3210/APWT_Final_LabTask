@@ -3,6 +3,8 @@ import type { Student } from './types';
 import StudentCard from './components/StudentCard';
 import DashboardHeader from './components/DashboardHeader';
 import StatBadge from './components/StatBadge';
+import SearchBar from './components/SearchBar';
+import SortControls, { type SortOption } from './components/SortControls';
 import LoadingSpinner from './components/LoadingSpinner';
 
 const studentData: Student[] = [
@@ -62,14 +64,9 @@ function App() {
   const [students, setStudents] = useState<Student[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [query, setQuery] = useState('');
-  
-  const normalizedQuery = query.trim().toLowerCase();
+  const [sortBy, setSortBy] = useState<SortOption>('default');
+  const [favorites, setFavorites] = useState<string[]>([]);
 
-  const visibleStudents = students.filter(
-  (student) =>
-    student.name.toLowerCase().includes(normalizedQuery) ||
-    student.major.toLowerCase().includes(normalizedQuery)
-  );
   useEffect(() => {
     const timerId = setTimeout(() => {
       setStudents(studentData);
@@ -79,11 +76,42 @@ function App() {
     return () => clearTimeout(timerId);
   }, []);
 
+  const handleFavoriteChange = (studentId: string, isFavorite: boolean) => {
+    setFavorites((previous) =>
+      isFavorite
+        ? [...previous, studentId]
+        : previous.filter((favoriteId) => favoriteId !== studentId)
+    );
+  };
+  
+  const normalizedQuery = query.trim().toLowerCase();
+
+  const filteredStudents = students.filter(
+    (student) =>
+      student.name.toLowerCase().includes(normalizedQuery) ||
+      student.major.toLowerCase().includes(normalizedQuery)
+  );
+
+  const visibleStudents = [...filteredStudents].sort((a, b) => {
+    if (sortBy === 'name') {
+      return a.name.localeCompare(b.name);
+    }
+    if (sortBy === 'gpa') {
+      return b.gpa - a.gpa;
+    }
+    return 0;
+  });
+
+  useEffect(() => {
+    document.title = `Dashboard — ${visibleStudents.length} Students`;
+  }, [visibleStudents.length]);
+  
+
   const totalCredits = students.reduce((sum, student) => sum + student.credits, 0);
   const averageGpa = students.length
     ? (students.reduce((sum, student) => sum + student.gpa, 0) / students.length).toFixed(2)
     : '0.00';
-  const majorCount = new Set(students.map((student) => student.major)).size;
+  //const majorCount = new Set(students.map((student) => student.major)).size;
 
   return (
     <div className="app">
@@ -93,6 +121,7 @@ function App() {
         navItems={['Overview', 'Students', 'Courses', 'Reports']}
         totalStudents={students.length}
         averageGpa={averageGpa}
+        favoriteCount={favorites.length}
       />
 
       <main className="container page">
@@ -103,12 +132,19 @@ function App() {
           </div>
           <div className="badge-row">
             <StatBadge label="Total Credits" value={totalCredits} />
-            <StatBadge label="Majors" value={majorCount} />
+            <StatBadge label="Showing" value={visibleStudents.length} />
           </div>
+        </div>
+
+        <div className="toolbar">
+          <SearchBar query={query} onQueryChange={setQuery} />
+          <SortControls sortBy={sortBy} onSortChange={setSortBy} />
         </div>
 
         {isLoading ? (
           <LoadingSpinner />
+        ) : visibleStudents.length === 0 ? (
+          <p className="empty-state">No students match "{query}". Try another name or major.</p> 
         ) : (
           <div className="student-grid">
             {visibleStudents.map((student) => (
@@ -121,6 +157,8 @@ function App() {
                 major={student.major}
                 credits={student.credits}
                 courses={student.courses}
+                initialFavorite={favorites.includes(student.id)}
+                onFavoriteChange={handleFavoriteChange}
               />
             ))}
           </div>
