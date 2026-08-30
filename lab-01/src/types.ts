@@ -4,7 +4,7 @@ export interface Course {
 }
 
 export interface Student {
-  id: number;
+  id: string;
   name: string;
   avatar: string;
   gpa: number;

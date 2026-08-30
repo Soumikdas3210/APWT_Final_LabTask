@@ -1,10 +1,12 @@
 import type { Student } from './types';
+import StudentCard from './components/StudentCard';
+import DashboardHeader from './components/DashboardHeader';
 import StatBadge from './components/StatBadge';
-import CourseTag from './components/CourseTag';
+
 
 const students: Student[] = [
   {
-    id: 2210451,
+    id: "22-10451-1",
     name: 'Ayesha Rahman',
     avatar: 'https://api.dicebear.com/7.x/initials/svg?seed=Ayesha%20Rahman&backgroundColor=4f46e5',
     gpa: 3.42,
@@ -17,9 +19,9 @@ const students: Student[] = [
     ],
   },
   {
-    id: 2210872,
-    name: 'Tanvir Hasan',
-    avatar: 'https://api.dicebear.com/7.x/initials/svg?seed=Tanvir%20Hasan&backgroundColor=0891b2',
+    id: "23-51709-2",
+    name: 'Soumik Das',
+    avatar: 'https://api.dicebear.com/7.x/initials/svg?seed=Soumik%20Das&backgroundColor=0891b2',
     gpa: 3.94,
     major: 'Software Engineering',
     credits: 84,
@@ -29,7 +31,7 @@ const students: Student[] = [
     ],
   },
   {
-    id: 2211039,
+    id: "22-11039-3",
     name: 'Nusrat Jahan',
     avatar: 'https://api.dicebear.com/7.x/initials/svg?seed=Nusrat%20Jahan&backgroundColor=be185d',
     gpa: 2.98,
@@ -42,7 +44,7 @@ const students: Student[] = [
     ],
   },
   {
-    id: 2211564,
+    id: "22-11564-2",
     name: 'Rafiul Karim',
     avatar: 'https://api.dicebear.com/7.x/initials/svg?seed=Rafiul%20Karim&backgroundColor=15803d',
     gpa: 3.68,
@@ -56,20 +58,49 @@ const students: Student[] = [
 ];
 
 function App() {
+  const totalCredits = students.reduce((sum, student) => sum + student.credits, 0);
+  const averageGpa = (
+    students.reduce((sum, student) => sum + student.gpa, 0) / students.length
+  ).toFixed(2);
+  const majorCount = new Set(students.map((student) => student.major)).size;
+
   return (
-    <div className="container" style={{ paddingTop: 32 }}>
-      <p>Students loaded: {students.length}</p>
+    <div className="app">
+      <DashboardHeader
+        title="Student Dashboard"
+        tagline="Academic records at a glance"
+        navItems={['Overview', 'Students', 'Courses', 'Reports']}
+        totalStudents={students.length}
+        averageGpa={averageGpa}
+      />
 
-      <div style={{ display: 'flex', gap: 12, marginTop: 16 }}>
-        <StatBadge label="GPA" value="3.42" />
-        <StatBadge label="Credits" value={96} accent />
-      </div>
+      <main className="container page">
+        <div className="section-head">
+          <div>
+            <h2 className="section-title">Enrolled Students</h2>
+            <p className="section-subtitle">Spring 2026 · Faculty of Science and Technology</p>
+          </div>
+          <div className="badge-row">
+            <StatBadge label="Total Credits" value={totalCredits} />
+            <StatBadge label="Majors" value={majorCount} />
+          </div>
+        </div>
 
-      <div className="tag-row" style={{ marginTop: 16 }}>
-        {students[0].courses.map((course, index) => (
-          <CourseTag key={`${course.name}-${index}`} courseName={course.name} color={course.color} />
-        ))}
-      </div>
+        <div className="student-grid">
+          {students.map((student) => (
+            <StudentCard
+              key={student.id}
+              name={student.name}
+              id={student.id}
+              avatar={student.avatar}
+              gpa={student.gpa}
+              major={student.major}
+              credits={student.credits}
+              courses={student.courses}
+            />
+          ))}
+        </div>
+      </main>
     </div>
   );
 }
