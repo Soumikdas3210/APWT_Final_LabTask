@@ -1,10 +1,13 @@
+import {useContext} from 'react';
+import {StudentContext} from '../context/StudentContext';
+
 interface SearchBarProps {
-  query: string;
-  onQueryChange: (value: string) => void;
   placeholder?: string;
 }
 
-function SearchBar({ query, onQueryChange, placeholder = 'Search students...' }: SearchBarProps) {
+function SearchBar({ placeholder = 'Search students...' }: SearchBarProps) {
+  const { query, setQuery } = useContext(StudentContext);
+
   return (
     <div className="search-bar">
       <span className="search-icon">⌕</span>
@@ -13,7 +16,7 @@ function SearchBar({ query, onQueryChange, placeholder = 'Search students...' }:
         type="search"
         value={query}
         placeholder={placeholder}
-        onChange={(event) => onQueryChange(event.target.value)}
+        onChange={(event) => setQuery(event.target.value)}
         aria-label="Search students by name or major"
       />
     </div>

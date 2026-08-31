@@ -1,15 +1,22 @@
+import { useContext } from 'react';
 import StatBadge from './StatBadge';
+import { ThemeContext } from '../context/ThemeContext';
+import {StudentContext} from '../context/StudentContext';
 
 interface DashboardHeaderProps {
   title: string;
   tagline: string;
   navItems: string[];
-  totalStudents: number;
-  averageGpa: string;
-  favoriteCount: number;
 }
 
-function DashboardHeader({ title, tagline, navItems, totalStudents, averageGpa, favoriteCount }: DashboardHeaderProps) {
+function DashboardHeader({ title, tagline, navItems }: DashboardHeaderProps) {
+  const { theme, toggleTheme } = useContext(ThemeContext);
+  const { students, favorites } = useContext(StudentContext);
+
+  const averageGpa = students.length 
+    ? (students.reduce((sum, student) => sum + student.gpa, 0) / students.length).toFixed(2)
+    : '0.00';
+
   return (
     <header className="header">
       <div className="container header-inner">
@@ -34,10 +41,14 @@ function DashboardHeader({ title, tagline, navItems, totalStudents, averageGpa, 
         </nav>
 
         <div className="header-stats">
-          <StatBadge label="Students" value={totalStudents} />
-          <StatBadge label="Avg GPA" value={averageGpa} accent />
-          <StatBadge label="Favorites" value={favoriteCount} accent />
+          <StatBadge label="Students" value={students.length} />
+          <StatBadge label="Avg GPA" value={averageGpa} />
+          <StatBadge label="Favorites" value={favorites.length} accent />
         </div>
+
+        <button type="button" className="theme-toggle" onClick={toggleTheme}>
+          {theme === 'light' ? '☾ Dark mode' : '☀ Light mode'}
+        </button>
       </div>
     </header>
   );

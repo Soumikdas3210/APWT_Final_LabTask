@@ -1,9 +1,8 @@
+import {useContext} from 'react';
+import {StudentContext} from '../context/StudentContext';
+
 export type SortOption = 'default' | 'name' | 'gpa';
 
-interface SortControlsProps {
-  sortBy: SortOption;
-  onSortChange: (value: SortOption) => void;
-}
 
 const SORT_OPTIONS: { value: SortOption; label: string }[] = [
   { value: 'default', label: 'Default' },
@@ -11,7 +10,8 @@ const SORT_OPTIONS: { value: SortOption; label: string }[] = [
   { value: 'gpa', label: 'GPA (High–Low)' },
 ];
 
-function SortControls({ sortBy, onSortChange }: SortControlsProps) {
+function SortControls() {
+  const { sortBy, setSortBy } = useContext(StudentContext);
   return (
     <div className="sort-controls">
       <span className="sort-label">Sort</span>
@@ -20,7 +20,7 @@ function SortControls({ sortBy, onSortChange }: SortControlsProps) {
           key={option.value}
           type="button"
           className={sortBy === option.value ? 'sort-button sort-button-active' : 'sort-button'}
-          onClick={() => onSortChange(option.value)}
+          onClick={() => setSortBy(option.value)}
         >
           {option.label}
         </button>

@@ -1,7 +1,8 @@
-import { useState } from 'react';
+import {useContext} from 'react';
 import type { Course } from '../types';
 import CourseTag from './CourseTag';
 import StatBadge from './StatBadge';
+import { StudentContext } from '../context/StudentContext';
 
 interface StudentCardProps {
   name: string;
@@ -11,19 +12,13 @@ interface StudentCardProps {
   major: string;
   credits: number;
   courses: Course[];
-  initialFavorite?: boolean;
-  onFavoriteChange: (id: string, isFavorite: boolean) => void;
 }
 
-function StudentCard({ name, id, avatar, gpa, major, credits, courses, initialFavorite = false, onFavoriteChange }: StudentCardProps) {
-  const [isFavorite, setIsFavorite] = useState(initialFavorite);
+function StudentCard({ name, id, avatar, gpa, major, credits, courses }: StudentCardProps) {
+  const { favorites, toggleFavorite, removeStudent } = useContext(StudentContext);
+  const isFavorite = favorites.includes(id);
   const accent = courses.length > 0 ? courses[0].color : '#4f46e5';
 
-  const handleFavoriteClick = () => {
-    const nextValue = !isFavorite;
-    setIsFavorite(nextValue);
-    onFavoriteChange(id, nextValue);
-  };
 
   return (
     <article className="card" style={{ '--card-accent': accent } as React.CSSProperties}>
@@ -41,7 +36,7 @@ function StudentCard({ name, id, avatar, gpa, major, credits, courses, initialFa
         <button
           type="button"
           className={isFavorite ? 'favorite-button favorite-button--active' : 'favorite-button'}
-          onClick={handleFavoriteClick}
+          onClick={() => toggleFavorite(id)}
           aria-label={isFavorite ? `Remove ${name} from favorites` : `Add ${name} to favorites`}
         >
           {isFavorite ? '★' : '☆'}
@@ -60,6 +55,12 @@ function StudentCard({ name, id, avatar, gpa, major, credits, courses, initialFa
             <CourseTag key={`${course.name}-${index}`} courseName={course.name} color={course.color} />
           ))}
         </div>
+      </div>
+      
+      <div className="card-actions">
+        <button type="button" className="remove-button" onClick={() => removeStudent(id)}>
+          Remove student
+        </button>
       </div>
     </article>
   );
